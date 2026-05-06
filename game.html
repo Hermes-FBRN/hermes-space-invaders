@@ -329,12 +329,12 @@ function update() {
   }
 
   // Particles
-  particles = particles.filter(p => p.life > 0);
   particles.forEach(p => {
     p.x += p.vx;
     p.y += p.vy;
-    p.life -= 0.03;
+    p.life = Math.max(0, p.life - 0.03);
   });
+  particles = particles.filter(p => p.life > 0);
 
   // Update UI
   document.getElementById('score').textContent = 'SCORE: ' + score;
@@ -389,12 +389,16 @@ function draw() {
   });
 
   // Particles
+  ctx.save();
   particles.forEach(p => {
-    ctx.globalAlpha = p.life;
+    const alpha = Math.max(0, Math.min(1, p.life));
+    const size = 4 * alpha;
+    if (alpha <= 0 || size <= 0) return;
+    ctx.globalAlpha = alpha;
     ctx.fillStyle = p.color;
-    ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
-    ctx.globalAlpha = 1;
+    ctx.fillRect(p.x - size / 2, p.y - size / 2, size, size);
   });
+  ctx.restore();
 }
 
 function loop() {
